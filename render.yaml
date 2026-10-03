@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: pet-adoption-platform
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn pet_adoption_platform.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
