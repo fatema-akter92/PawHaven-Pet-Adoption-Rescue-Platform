@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Apply to Adopt {{ pet.name }} - PawHaven{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Navigation Back -->
+            <a href="{% url 'pet_detail' pet.pk %}" class="small text-muted mb-3 d-inline-block">
+                &larr; Back to {{ pet.name }}'s Profile
+            </a>
+
+            <!-- Card Header Summary -->
+            <div class="card p-4 mb-4 shadow-sm border" style="border-radius: 20px; border-color: #EDE6FD !important; background: #FAF9FE;">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width: 75px; height: 75px; border-radius: 16px; overflow: hidden; background: #E9DEFF; flex-shrink: 0;">
+                        {% if pet.image %}
+                            <img src="{{ pet.image.url }}" class="w-100 h-100 object-fit-cover" alt="{{ pet.name }}">
+                        {% else %}
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center fs-2">🐾</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="badge-pill-tag mb-1">{{ pet.animal_type }}</span>
+                        <h3 class="fw-bold mb-0 text-purple" style="color: #491AA0;">Adoption Application for {{ pet.name }}</h3>
+                        <p class="text-muted small mb-0">{{ pet.breed }} &bull; {{ pet.age_display }} &bull; {{ pet.gender }} &bull; {{ pet.location }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Application Form -->
+            <div class="card p-4 p-md-5 shadow-sm border bg-white" style="border-radius: 24px; border-color: #EDE6FD !important;">
+                <h4 class="fw-bold text-purple mb-1" style="color: #2C0F66;">Adopter Details &amp; Questionnaire</h4>
+                <p class="text-muted small mb-4">Please fill in truthful details so our shelter team can evaluate this match.</p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" style="border-radius: 12px;">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Address -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Residential Address <span class="text-danger">*</span></label>
+                        {{ form.address }}
+                        {% if form.address.errors %}
+                            <div class="text-danger small mt-1">{{ form.address.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Phone Number <span class="text-danger">*</span></label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <div class="text-danger small mt-1">{{ form.phone.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Why do you want this pet? -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">Why do you want this pet? <span class="text-danger">*</span></label>
+                        {{ form.reason }}
+                        {% if form.reason.errors %}
+                            <div class="text-danger small mt-1">{{ form.reason.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Have you owned a pet before? (Radio: Yes / No) -->
+                    <div class="mb-4 p-3 rounded-4" style="background: #FAF8FF; border: 1.5px solid #E9DEFF;">
+                        <label class="form-label fw-bold small text-purple d-block mb-2" style="color: #491AA0;">Have you owned a pet before?</label>
+                        <div class="d-flex flex-column gap-2">
+                            {% for radio in form.previous_pet_experience %}
+                                <div class="form-check">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.previous_pet_experience.errors %}
+                            <div class="text-danger small mt-1">{{ form.previous_pet_experience.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Additional message -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">Additional Message (Optional)</label>
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                            <div class="text-danger small mt-1">{{ form.message.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-lavender py-3 fs-5 fw-bold">
+                            Submit Application
+                        </button>
+                        <a href="{% url 'pet_detail' pet.pk %}" class="btn btn-light py-2 text-muted">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
