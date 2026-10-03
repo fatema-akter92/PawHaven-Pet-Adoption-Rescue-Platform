@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Adoption Requests - PawHaven{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: #2C0F66;">My Adoption Requests</h2>
+            <p class="text-muted mb-0">Track all your submitted pet adoption applications and status updates.</p>
+        </div>
+        <a href="{% url 'pet_list' %}" class="btn btn-lavender-outline">
+            <i class="bi bi-search-heart me-1"></i>Find More Pets
+        </a>
+    </div>
+
+    <!-- Status Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card p-3 shadow-sm border text-center" style="border-radius: 18px; border-color: #EDE6FD !important; background: #FFFFFF;">
+                <span class="text-muted small d-block">Total Applications</span>
+                <h3 class="fw-bold mb-0 text-purple" style="color: #491AA0;">{{ total_count }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card p-3 shadow-sm border text-center" style="border-radius: 18px; border-color: #FDE68A !important; background: #FFFDF5;">
+                <span class="text-muted small d-block">Pending Review</span>
+                <h3 class="fw-bold mb-0 text-warning" style="color: #D97706 !important;">{{ pending_count }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card p-3 shadow-sm border text-center" style="border-radius: 18px; border-color: #A7F3D0 !important; background: #F0FDF4;">
+                <span class="text-muted small d-block">Approved</span>
+                <h3 class="fw-bold mb-0 text-success" style="color: #059669 !important;">{{ approved_count }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card p-3 shadow-sm border text-center" style="border-radius: 18px; border-color: #FECDD3 !important; background: #FFF1F2;">
+                <span class="text-muted small d-block">Rejected</span>
+                <h3 class="fw-bold mb-0 text-danger" style="color: #E11D48 !important;">{{ rejected_count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <ul class="nav nav-pills mb-4 gap-2">
+        <li class="nav-item">
+            <a class="nav-link {% if not status_filter %}btn-lavender text-white{% else %}btn-lavender-light{% endif %}" href="{% url 'my_adoptions' %}">All ({{ total_count }})</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if status_filter == 'Pending' %}btn-lavender text-white{% else %}btn-lavender-light{% endif %}" href="{% url 'my_adoptions' %}?status=pending">Pending ({{ pending_count }})</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if status_filter == 'Approved' %}btn-lavender text-white{% else %}btn-lavender-light{% endif %}" href="{% url 'my_adoptions' %}?status=approved">Approved ({{ approved_count }})</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if status_filter == 'Rejected' %}btn-lavender text-white{% else %}btn-lavender-light{% endif %}" href="{% url 'my_adoptions' %}?status=rejected">Rejected ({{ rejected_count }})</a>
+        </li>
+    </ul>
+
+    <!-- Applications List / Table -->
+    {% if applications %}
+        <div class="card shadow-sm border overflow-hidden" style="border-radius: 20px; border-color: #EDE6FD !important; background: #FFFFFF;">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead style="background-color: #F8F5FE; border-bottom: 2px solid #EDE6FD;">
+                        <tr>
+                            <th class="py-3 px-4 text-purple" style="color: #491AA0;">Pet</th>
+                            <th class="py-3 text-purple" style="color: #491AA0;">Species / Breed</th>
+                            <th class="py-3 text-purple" style="color: #491AA0;">Date Applied</th>
+                            <th class="py-3 text-purple" style="color: #491AA0;">Status</th>
+                            <th class="py-3 text-purple" style="color: #491AA0;">Progress Tracker</th>
+                            <th class="py-3 px-4 text-end text-purple" style="color: #491AA0;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                            <tr>
+                                <!-- Pet Column -->
+                                <td class="py-3 px-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div style="width: 52px; height: 52px; border-radius: 12px; overflow: hidden; background: #E9DEFF; flex-shrink: 0;">
+                                            {% if app.pet.image %}
+                                                <img src="{{ app.pet.image.url }}" class="w-100 h-100 object-fit-cover" alt="{{ app.pet.name }}">
+                                            {% else %}
+                                                <div class="w-100 h-100 d-flex align-items-center justify-content-center fs-4">🐾</div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'pet_detail' app.pet.pk %}" class="fw-bold text-purple text-decoration-none" style="color: #491AA0;">{{ app.pet.name }}</a>
+                                            <div class="text-muted small"><i class="bi bi-geo-alt-fill me-1"></i>{{ app.pet.location }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Species Column -->
+                                <td>
+                                    <div><strong>{{ app.pet.animal_type }}</strong></div>
+                                    <div class="text-muted small">{{ app.pet.breed }}</div>
+                                </td>
+
+                                <!-- Date Column (Formatted as: 20 Sep 2026 as per PDF example) -->
+                                <td>
+                                    <span class="fw-semibold text-dark">{{ app.created_at|date:"d M Y" }}</span>
+                                </td>
+
+                                <!-- Status Badge -->
+                                <td>
+                                    {% if app.status == 'Pending' %}
+                                        <span class="badge-pending">⏳ Pending</span>
+                                    {% elif app.status == 'Approved' %}
+                                        <span class="badge-available" style="background:#D1FAE5; color:#065F46; border-color:#6EE7B7;">✅ Approved</span>
+                                    {% else %}
+                                        <span class="badge-adopted">❌ Rejected</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Visual Stepper -->
+                                <td style="min-width: 200px;">
+                                    <div class="d-flex align-items-center gap-1 small">
+                                        {% if app.status == 'Pending' %}
+                                            <span class="badge bg-primary text-white" style="font-size: 0.72rem;">1. Submitted</span>
+                                            <span class="text-muted">&rarr;</span>
+                                            <span class="badge bg-warning text-dark" style="font-size: 0.72rem;">2. Under Review</span>
+                                        {% elif app.status == 'Approved' %}
+                                            <span class="badge bg-success text-white" style="font-size: 0.72rem;">✓ Ready for Pickup!</span>
+                                        {% else %}
+                                            <span class="badge bg-danger text-white" style="font-size: 0.72rem;">Closed</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if app.admin_notes %}
+                                        <div class="text-muted small mt-1" style="font-size: 0.75rem;">
+                                            <i class="bi bi-chat-left-dots text-primary me-1"></i>{{ app.admin_notes }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Action -->
+                                <td class="py-3 px-4 text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{% url 'pet_detail' app.pet.pk %}" class="btn btn-sm btn-lavender-light" title="View Pet">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        {% if app.status == 'Pending' %}
+                                            <a href="{% url 'cancel_adoption' app.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to withdraw this application?');" title="Withdraw Request">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="card p-5 text-center shadow-sm border bg-white" style="border-radius: 24px; border-color: #EDE6FD !important;">
+            <div style="font-size: 4rem;">📋</div>
+            <h4 class="fw-bold mt-3 text-purple" style="color: #491AA0;">No Adoption Applications Found</h4>
+            <p class="text-muted mb-4">You haven't submitted any adoption applications yet. Find a pet you love and apply today!</p>
+            <div>
+                <a href="{% url 'pet_list' %}" class="btn btn-lavender px-4 py-2">
+                    <i class="bi bi-search me-2"></i>Browse Available Pets
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
