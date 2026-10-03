@@ -79,15 +79,15 @@
 
 | Method | Endpoint | Permissions | Description |
 |---|---|---|---|
-| `GET` | `/api/pets/` | Public | Paginated list of pets (Supports `?search=...`, `?animal_type=...`, `?page=...`) |
+| `GET` | `/api/pets/` | Public | Paginated list of pets  |
 | `GET` | `/api/pets/<id>/` | Public | Retrieve individual pet details |
 | `POST` | `/api/pets/` | Staff/Admin | Create a new pet profile |
 | `PUT` | `/api/pets/<id>/` | Staff/Admin | Update pet profile |
 | `DELETE` | `/api/pets/<id>/` | Staff/Admin | Delete pet profile |
 | `GET` | `/api/adoptions/` | Authenticated | Adopter views their own requests; Staff views all |
-| `POST` | `/api/adoptions/` | Authenticated | Submit adoption request (Enforces Rules 1 & 2) |
+| `POST` | `/api/adoptions/` | Authenticated | Submit adoption request |
 | `GET` | `/api/adoptions/<id>/` | Authenticated | View adoption request detail |
-| `PUT` | `/api/adoptions/<id>/` | Staff/Admin | Approve/Reject request (Triggers Rule 3) |
+| `PUT` | `/api/adoptions/<id>/` | Staff/Admin | Approve/Reject request |
 | `GET` | `/api/favorites/` | Authenticated | List user's favorite pets |
 | `POST` | `/api/favorites/toggle/<id>/` | Authenticated | Toggle favorite status for pet |
 | `POST` | `/api/auth/token/` | Public | Obtain DRF Auth Token via username/password |
