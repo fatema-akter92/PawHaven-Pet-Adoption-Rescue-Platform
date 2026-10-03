@@ -5,8 +5,10 @@
 ---
 
 
-Visit the live link : https://pawhaven-pet-adoption.onrender.com/
+# Visit the live link : https://pawhaven-pet-adoption.onrender.com/
+
 ---
+
 
 ## Features Implemented (From Specification)
 
@@ -91,6 +93,3 @@ Visit the live link : https://pawhaven-pet-adoption.onrender.com/
 
 ---
 
-Visit **http://127.0.0.1:8000/** in your browser!
-
----
