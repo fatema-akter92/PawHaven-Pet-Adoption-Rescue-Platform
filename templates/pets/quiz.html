@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}PawMatch Pet Compatibility Quiz - PawHaven{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Quiz Header -->
+    <div class="text-center mb-5">
+        <span class="hero-badge">✨ Interactive Matchmaker</span>
+        <h2 class="display-5 fw-extrabold mb-2" style="color: #2C0F66;">PawMatch Compatibility Quiz</h2>
+        <p class="lead text-muted mx-auto" style="max-width: 650px;">
+            Answer 5 quick lifestyle questions to discover which shelter pets align best with your living environment, schedule, and energy level.
+        </p>
+    </div>
+
+    <!-- Quiz Form -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="card p-4 p-md-5 shadow-sm border bg-white" style="border-radius: 28px; border-color: #EDE6FD !important;">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Question 1: Animal Preference -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-purple" style="color: #491AA0;">
+                            1. What type of companion animal are you looking for?
+                        </label>
+                        <select name="preferred_type" class="form-select">
+                            <option value="Any">✨ Any loving animal companion</option>
+                            <option value="Dog">🐕 Dog</option>
+                            <option value="Cat">🐈 Cat</option>
+                            <option value="Rabbit">🐇 Rabbit</option>
+                            <option value="Bird">🦜 Bird</option>
+                        </select>
+                    </div>
+
+                    <!-- Question 2: Living Space -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-purple" style="color: #491AA0;">
+                            2. What is your living space setup?
+                        </label>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="p-3 border rounded-3 d-block text-center cursor-pointer h-100 bg-light">
+                                    <input type="radio" name="living_space" value="Apartment" checked class="form-check-input mb-2 d-block mx-auto">
+                                    <strong>Apartment / Flat</strong>
+                                    <div class="small text-muted">Cozy indoor living</div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="p-3 border rounded-3 d-block text-center cursor-pointer h-100 bg-light">
+                                    <input type="radio" name="living_space" value="House" class="form-check-input mb-2 d-block mx-auto">
+                                    <strong>House / Small Yard</strong>
+                                    <div class="small text-muted">Moderate space</div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="p-3 border rounded-3 d-block text-center cursor-pointer h-100 bg-light">
+                                    <input type="radio" name="living_space" value="Yard" class="form-check-input mb-2 d-block mx-auto">
+                                    <strong>House with Big Yard</strong>
+                                    <div class="small text-muted">Spacious room to run</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3: Daily Activity Level -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-purple" style="color: #491AA0;">
+                            3. What is your preferred activity level?
+                        </label>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="p-3 border rounded-3 d-block text-center cursor-pointer h-100 bg-light">
+                                    <input type="radio" name="activity_level" value="Low" class="form-check-input mb-2 d-block mx-auto">
+                                    <strong>Calm &amp; Relaxed</strong>
+                                    <div class="small text-muted">Couch snuggles & quiet naps</div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="p-3 border rounded-3 d-block text-center cursor-pointer h-100 bg-light">
+                                    <input type="radio" name="activity_level" value="Moderate" checked class="form-check-input mb-2 d-block mx-auto">
+                                    <strong>Moderate</strong>
+                                    <div class="small text-muted">Daily evening walks & play</div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="p-3 border rounded-3 d-block text-center cursor-pointer h-100 bg-light">
+                                    <input type="radio" name="activity_level" value="High" class="form-check-input mb-2 d-block mx-auto">
+                                    <strong>High Energy</strong>
+                                    <div class="small text-muted">Jogging, parks & adventures</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 4: Children -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-purple" style="color: #491AA0;">
+                            4. Are there children living in or visiting your home?
+                        </label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="has_kids" id="kids_yes" value="yes" checked>
+                                <label class="form-check-label" for="kids_yes">Yes, children present</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="has_kids" id="kids_no" value="no">
+                                <label class="form-check-label" for="kids_no">No children</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 5: Other Pets -->
+                    <div class="mb-5">
+                        <label class="form-label fw-bold text-purple" style="color: #491AA0;">
+                            5. Do you already have other pets at home?
+                        </label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="has_pets" id="pets_yes" value="yes">
+                                <label class="form-check-label" for="pets_yes">Yes, other cats/dogs</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="has_pets" id="pets_no" value="no" checked>
+                                <label class="form-check-label" for="pets_no">No, this will be my sole pet</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-lavender w-100 py-3 fs-5 fw-bold">
+                        <i class="bi bi-stars me-2"></i>Calculate My Best Pet Matches
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    {% if has_results %}
+        <div id="quiz-results" class="pt-4 border-top">
+            <div class="text-center mb-4">
+                <span class="badge bg-success text-white px-3 py-2 fw-bold" style="border-radius: 20px;">✓ Match Analysis Complete</span>
+                <h3 class="fw-bold mt-2 text-purple" style="color: #2C0F66;">Recommended Companion Matches</h3>
+                <p class="text-muted">Ranked by personality traits, space requirements, and sociability:</p>
+            </div>
+
+            <div class="row g-4">
+                {% for score, pet in matched_pets %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card card-lavender h-100 position-relative">
+                            <!-- Match Score Pill -->
+                            <div class="position-absolute top-0 end-0 m-3 z-3">
+                                <span class="badge px-3 py-2 fs-6 fw-bold" style="background: #622CD1; color: white; border-radius: 9999px; box-shadow: 0 4px 12px rgba(98, 44, 209, 0.4);">
+                                    {{ score }}% Match
+                                </span>
+                            </div>
+
+                            <div style="height: 200px; background: #E9DEFF; overflow: hidden;">
+                                {% if pet.image %}
+                                    <img src="{{ pet.image.url }}" class="w-100 h-100 object-fit-cover" alt="{{ pet.name }}">
+                                {% else %}
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center fs-1">🐾</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-body p-4 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h4 class="fw-bold mb-0 text-purple" style="color: #491AA0;">{{ pet.name }}</h4>
+                                    <span class="badge-pill-tag">{{ pet.animal_type }}</span>
+                                </div>
+                                <p class="text-muted small mb-3"><strong>{{ pet.breed }}</strong> &bull; {{ pet.location }}</p>
+
+                                <div class="d-flex flex-wrap gap-1 mb-3">
+                                    <span class="badge-pill-tag">Energy: {{ pet.energy_level }}</span>
+                                    <span class="badge-pill-tag">Size: {{ pet.size }}</span>
+                                    {% if pet.good_with_kids %}<span class="badge-pill-tag text-success">Good with kids</span>{% endif %}
+                                </div>
+
+                                <p class="card-text text-muted small flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    {{ pet.description }}
+                                </p>
+
+                                <div class="pt-3 border-top mt-auto">
+                                    <a href="{% url 'pet_detail' pet.pk %}" class="btn btn-lavender w-100 py-2">
+                                        View &amp; Apply for {{ pet.name }} &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">No pets currently match those criteria. Browse our full list to see all available friends!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
