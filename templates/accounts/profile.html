@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - PawHaven{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Profile Header Card -->
+    <div class="card p-4 p-md-5 mb-4 shadow-sm border bg-white" style="border-radius: 24px; border-color: #EDE6FD !important;">
+        <div class="row align-items-center g-4">
+            <div class="col-md-auto text-center">
+                <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #7843E5, #B799F8); color: white; display:flex; align-items:center; justify-content:center; font-size: 2.8rem; font-weight: bold; margin: 0 auto; box-shadow: 0 10px 25px rgba(120, 67, 229, 0.3);">
+                    {{ user.username|make_list|first|upper }}
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                    <h2 class="fw-bold mb-0 text-purple" style="color: #2C0F66;">{{ user.first_name }} {{ user.last_name }}</h2>
+                    {% if user.is_staff %}
+                        <span class="badge bg-danger text-white">Staff Admin</span>
+                    {% else %}
+                        <span class="badge-pill-tag">Adopter Member</span>
+                    {% endif %}
+                </div>
+                <p class="text-muted mb-2">@{{ user.username }} &bull; {{ user.email|default:"No email provided" }}</p>
+                <div class="small text-muted">
+                    <i class="bi bi-calendar3 me-1"></i>Joined on {{ user.date_joined|date:"F d, Y" }}
+                </div>
+            </div>
+            <div class="col-md-auto">
+                <div class="d-flex gap-2">
+                    <a href="{% url 'my_adoptions' %}" class="btn btn-lavender">
+                        <i class="bi bi-folder-fill me-1"></i>My Applications
+                    </a>
+                    <a href="{% url 'my_favorites' %}" class="btn btn-lavender-outline">
+                        <i class="bi bi-heart-fill text-danger me-1"></i>Favorites ({{ favorites_count }})
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Application Statistics -->
+        <div class="col-lg-6">
+            <div class="card p-4 shadow-sm border bg-white h-100" style="border-radius: 20px; border-color: #EDE6FD !important;">
+                <h5 class="fw-bold text-purple mb-4" style="color: #491AA0;">
+                    <i class="bi bi-bar-chart-fill me-2 text-primary"></i>Adoption Activity Overview
+                </h5>
+
+                <div class="row g-3 text-center mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4 bg-light">
+                            <span class="small text-muted d-block">Submitted</span>
+                            <h3 class="fw-bold mb-0 text-purple">{{ total_apps }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4" style="background: #FFFDF5;">
+                            <span class="small text-muted d-block">Pending</span>
+                            <h3 class="fw-bold mb-0 text-warning">{{ pending_apps }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4" style="background: #F0FDF4;">
+                            <span class="small text-muted d-block">Approved</span>
+                            <h3 class="fw-bold mb-0 text-success">{{ approved_apps }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 rounded-4" style="background: #FFF1F2;">
+                            <span class="small text-muted d-block">Rejected</span>
+                            <h3 class="fw-bold mb-0 text-danger">{{ rejected_apps }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold small text-muted text-uppercase mb-3">Recent Applications</h6>
+                {% if recent_applications %}
+                    <div class="list-group list-group-flush">
+                        {% for app in recent_applications %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
+                                <div>
+                                    <strong class="text-purple">{{ app.pet.name }}</strong>
+                                    <span class="text-muted small">({{ app.pet.animal_type }})</span>
+                                    <div class="text-muted small">{{ app.created_at|date:"M d, Y" }}</div>
+                                </div>
+                                <div>
+                                    {% if app.status == 'Pending' %}
+                                        <span class="badge-pending">Pending</span>
+                                    {% elif app.status == 'Approved' %}
+                                        <span class="badge-available">Approved</span>
+                                    {% else %}
+                                        <span class="badge-adopted">Rejected</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted small">No applications submitted yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- API Access & Token Management (Unique Feature) -->
+        <div class="col-lg-6">
+            <div class="card p-4 shadow-sm border bg-white h-100" style="border-radius: 20px; border-color: #EDE6FD !important;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-purple mb-0" style="color: #491AA0;">
+                        <i class="bi bi-key-fill me-2 text-warning"></i>Developer &amp; REST API Access
+                    </h5>
+                    <a href="{% url 'api_docs' %}" class="small text-purple fw-bold">API Documentation &rarr;</a>
+                </div>
+
+                <p class="text-muted small mb-3">
+                    Your personal API token allows programmatic access to PawHaven's REST API endpoints via HTTP headers.
+                </p>
+
+                <!-- Token Display Box -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Your Active API Token:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control font-monospace small bg-light" value="{{ token }}" id="userTokenField" readonly>
+                        <button class="btn btn-lavender" id="tokenCopyBtn" onclick="copyToClipboard('{{ token }}', 'tokenCopyBtn')">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Code Example -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Sample cURL Header:</label>
+                    <div class="bg-dark text-light p-3 rounded-3 font-monospace small" style="font-size: 0.8rem; overflow-x: auto;">
+                        curl -H "Authorization: Token {{ token }}" http://127.0.0.1:8000/api/adoptions/
+                    </div>
+                </div>
+
+                <!-- Regenerate Form -->
+                <form method="post" action="{% url 'regenerate_token' %}" class="mt-auto pt-2" onsubmit="return confirm('Regenerate your API token? Any previous integrations using this token will stop working.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-lavender-outline w-100">
+                        <i class="bi bi-arrow-repeat me-1"></i>Regenerate API Token
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
