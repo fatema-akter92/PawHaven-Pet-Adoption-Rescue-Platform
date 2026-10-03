@@ -62,6 +62,24 @@ class Command(BaseCommand):
         Token.objects.get_or_create(user=fatima)
         self.stdout.write(self.style.SUCCESS("[OK] Adopter created: fatima / fatima123"))
 
+        # User Meem (Admin)
+        meem, created = User.objects.get_or_create(
+            username='meem',
+            defaults={
+                'email': 'fatemaaktermeem838@gmail.com',
+                'first_name': 'Fatema',
+                'last_name': 'Akter',
+                'is_staff': True,
+                'is_superuser': True,
+            }
+        )
+        meem.is_staff = True
+        meem.is_superuser = True
+        meem.set_password('meem123')
+        meem.save()
+        Token.objects.get_or_create(user=meem)
+        self.stdout.write(self.style.SUCCESS("[OK] Admin user created: meem / meem123"))
+
         # Helper to generate aesthetic pet banner images
         def generate_pet_image(filename, name, animal_type, bg_color):
             filepath = os.path.join(media_pets_dir, filename)
