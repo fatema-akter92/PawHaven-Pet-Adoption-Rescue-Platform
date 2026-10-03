@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}REST API Documentation - PawHaven{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <span class="hero-badge">⚡ Django REST Framework</span>
+            <h2 class="display-6 fw-extrabold mb-1" style="color: #2C0F66;">REST API Reference &amp; Explorer</h2>
+            <p class="text-muted mb-0">Complete documentation for Pet and Adoption REST endpoints with Token Authentication.</p>
+        </div>
+        <a href="/api/" target="_blank" class="btn btn-lavender">
+            <i class="bi bi-box-arrow-up-right me-2"></i>Open Browsable API
+        </a>
+    </div>
+
+    <!-- Token Quick Bar -->
+    <div class="card p-4 mb-4 shadow-sm border" style="border-radius: 20px; border-color: #D5C2FC !important; background: #FAF8FF;">
+        <div class="row align-items-center g-3">
+            <div class="col-md-7">
+                <h6 class="fw-bold text-purple mb-1" style="color: #491AA0;"><i class="bi bi-key-fill me-2 text-warning"></i>Your API Authentication Token</h6>
+                {% if user.is_authenticated %}
+                    <p class="text-muted small mb-0">Use this token in HTTP header: <code>Authorization: Token &lt;your_token&gt;</code></p>
+                {% else %}
+                    <p class="text-muted small mb-0"><a href="{% url 'login' %}?next={{ request.path }}" class="text-purple fw-bold">Login</a> to generate your personal API token.</p>
+                {% endif %}
+            </div>
+            <div class="col-md-5">
+                {% if user.is_authenticated %}
+                    <div class="input-group">
+                        <input type="text" class="form-control font-monospace small bg-white" value="{{ user_token }}" id="apiTokenInput" readonly>
+                        <button class="btn btn-lavender" id="copyTokenBtn" onclick="copyToClipboard('{{ user_token }}', 'copyTokenBtn')">
+                            Copy Token
+                        </button>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-lavender-outline w-100">Login to View Token</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Endpoint Navigation Sidebar -->
+        <div class="col-lg-3">
+            <div class="card p-3 shadow-sm border position-sticky" style="top: 100px; border-radius: 18px; border-color: #EDE6FD !important; background: #FFFFFF;">
+                <h6 class="fw-bold text-purple mb-3" style="color: #491AA0;">API Endpoints</h6>
+                <div class="list-group list-group-flush small">
+                    <a href="#pets-api" class="list-group-item list-group-item-action border-0 py-2 rounded-2">🐾 Pet Endpoints</a>
+                    <a href="#adoptions-api" class="list-group-item list-group-item-action border-0 py-2 rounded-2">📋 Adoption Endpoints</a>
+                    <a href="#search-api" class="list-group-item list-group-item-action border-0 py-2 rounded-2">🔍 Search &amp; Filter API</a>
+                    <a href="#auth-api" class="list-group-item list-group-item-action border-0 py-2 rounded-2">🔑 Auth &amp; Token API</a>
+                    <a href="#favorites-api" class="list-group-item list-group-item-action border-0 py-2 rounded-2">❤️ Favorites API</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documentation Content -->
+        <div class="col-lg-9">
+            <!-- 1. Pet API -->
+            <div class="card p-4 mb-4 shadow-sm border bg-white" id="pets-api" style="border-radius: 20px; border-color: #EDE6FD !important;">
+                <h4 class="fw-bold text-purple mb-3" style="color: #491AA0;">1. Pet API</h4>
+                <p class="text-muted small">Manage and retrieve pet profiles. Read operations are public; write operations require administrator credentials.</p>
+
+                <div class="table-responsive mb-3">
+                    <table class="table table-bordered small">
+                        <thead class="table-light">
+                            <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/pets/</code></td><td>Public</td><td>List all pets (paginated: 6 items per page)</td></tr>
+                            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/pets/&lt;id&gt;/</code></td><td>Public</td><td>Retrieve details for a single pet</td></tr>
+                            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/pets/</code></td><td>Staff</td><td>Create new pet profile</td></tr>
+                            <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/pets/&lt;id&gt;/</code></td><td>Staff</td><td>Update pet profile</td></tr>
+                            <tr><td><span class="badge bg-danger">DELETE</span></td><td><code>/api/pets/&lt;id&gt;/</code></td><td>Staff</td><td>Delete pet profile</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h6 class="fw-bold mt-3">Example cURL Request:</h6>
+                <div class="bg-dark text-light p-3 rounded-3 font-monospace small mb-3">
+                    curl -X GET "http://127.0.0.1:8000/api/pets/" -H "Accept: application/json"
+                </div>
+
+                <h6 class="fw-bold mt-2">Example JSON Response:</h6>
+                <pre class="bg-light p-3 rounded-3 text-dark small" style="max-height: 200px; overflow-y: auto;">
+{
+  "count": 12,
+  "next": "http://127.0.0.1:8000/api/pets/?page=2",
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "name": "Max",
+      "animal_type": "Dog",
+      "breed": "Golden Retriever",
+      "age": 2,
+      "age_display": "2 years",
+      "gender": "Male",
+      "location": "Dhaka",
+      "description": "Friendly, playful, loves fetch and swimming.",
+      "image": "/media/pets/max.jpg",
+      "status": "Available",
+      "is_vaccinated": true,
+      "is_neutered": true,
+      "is_microchipped": true,
+      "good_with_kids": true,
+      "good_with_pets": true
+    }
+  ]
+}</pre>
+            </div>
+
+            <!-- 2. Adoption API -->
+            <div class="card p-4 mb-4 shadow-sm border bg-white" id="adoptions-api" style="border-radius: 20px; border-color: #EDE6FD !important;">
+                <h4 class="fw-bold text-purple mb-3" style="color: #491AA0;">2. Adoption API</h4>
+                <p class="text-muted small">
+                    Adopters can submit and view their own applications. Administrators can view all and update statuses.
+                    <br><strong>Business Rules Enforced:</strong> Rule 1 (Only available pets can be adopted), Rule 2 (No duplicate active applications), Rule 3 (Approval sets pet to Adopted).
+                </p>
+
+                <div class="table-responsive mb-3">
+                    <table class="table table-bordered small">
+                        <thead class="table-light">
+                            <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/adoptions/</code></td><td>User / Token</td><td>Get authenticated user's adoption requests (Admins see all)</td></tr>
+                            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/adoptions/</code></td><td>User / Token</td><td>Submit new application (Checks Rules 1 &amp; 2)</td></tr>
+                            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/adoptions/&lt;id&gt;/</code></td><td>User / Token</td><td>Retrieve request detail</td></tr>
+                            <tr><td><span class="badge bg-warning text-dark">PUT</span></td><td><code>/api/adoptions/&lt;id&gt;/</code></td><td>Staff</td><td>Update status (Triggers Rule 3: Approved &rarr; Pet Adopted)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h6 class="fw-bold mt-3">Example Application Submission Payload:</h6>
+                <div class="bg-dark text-light p-3 rounded-3 font-monospace small mb-3">
+curl -X POST "http://127.0.0.1:8000/api/adoptions/" \<br>
+&nbsp;&nbsp;-H "Authorization: Token YOUR_TOKEN" \<br>
+&nbsp;&nbsp;-H "Content-Type: application/json" \<br>
+&nbsp;&nbsp;-d '{"pet": 1, "phone": "+8801712345678", "address": "Dhanmondi, Dhaka", "reason": "Loving home with garden", "previous_pet_experience": true, "message": "Ready to adopt!"}'
+                </div>
+            </div>
+
+            <!-- 3. Search & Filter API -->
+            <div class="card p-4 mb-4 shadow-sm border bg-white" id="search-api" style="border-radius: 20px; border-color: #EDE6FD !important;">
+                <h4 class="fw-bold text-purple mb-3" style="color: #491AA0;">3. Search &amp; Filter API</h4>
+                <p class="text-muted small">Combine search keywords and multiple filters simultaneously:</p>
+
+                <div class="list-group list-group-flush small">
+                    <div class="list-group-item py-3">
+                        <strong>Search Keyword:</strong>
+                        <div class="mt-1 font-monospace bg-light p-2 rounded">GET /api/pets/?search=golden</div>
+                    </div>
+                    <div class="list-group-item py-3">
+                        <strong>Filter by Animal Type:</strong>
+                        <div class="mt-1 font-monospace bg-light p-2 rounded">GET /api/pets/?animal_type=Dog</div>
+                    </div>
+                    <div class="list-group-item py-3">
+                        <strong>Filter by Gender:</strong>
+                        <div class="mt-1 font-monospace bg-light p-2 rounded">GET /api/pets/?gender=Male</div>
+                    </div>
+                    <div class="list-group-item py-3">
+                        <strong>Filter by Location:</strong>
+                        <div class="mt-1 font-monospace bg-light p-2 rounded">GET /api/pets/?location=Dhaka</div>
+                    </div>
+                    <div class="list-group-item py-3">
+                        <strong>Combined Search, Filter &amp; Pagination:</strong>
+                        <div class="mt-1 font-monospace bg-light p-2 rounded">GET /api/pets/?animal_type=Dog&amp;gender=Male&amp;location=Dhaka&amp;page=2</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Auth API -->
+            <div class="card p-4 mb-4 shadow-sm border bg-white" id="auth-api" style="border-radius: 20px; border-color: #EDE6FD !important;">
+                <h4 class="fw-bold text-purple mb-3" style="color: #491AA0;">4. Authentication &amp; Token API</h4>
+                <p class="text-muted small">Generate tokens via REST API for mobile clients or external consumers:</p>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered small">
+                        <thead class="table-light">
+                            <tr><th>Method</th><th>Endpoint</th><th>Payload</th><th>Response</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/auth/token/</code></td><td><code>{"username": "...", "password": "..."}</code></td><td><code>{"token": "..."}</code></td></tr>
+                            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/auth/register/</code></td><td><code>{"username": "...", "password": "...", "email": "..."}</code></td><td><code>{"token": "...", "user": {...}}</code></td></tr>
+                            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/auth/login/</code></td><td><code>{"username": "...", "password": "..."}</code></td><td><code>{"token": "...", "user": {...}}</code></td></tr>
+                            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/auth/me/</code></td><td>Token Header</td><td>Current user stats &amp; details</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. Favorites API -->
+            <div class="card p-4 shadow-sm border bg-white" id="favorites-api" style="border-radius: 20px; border-color: #EDE6FD !important;">
+                <h4 class="fw-bold text-purple mb-3" style="color: #491AA0;">5. Favorites API (Bonus)</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered small">
+                        <thead class="table-light">
+                            <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="badge bg-success">GET</span></td><td><code>/api/favorites/</code></td><td>User Token</td><td>List user's bookmarked pets</td></tr>
+                            <tr><td><span class="badge bg-primary">POST</span></td><td><code>/api/favorites/toggle/&lt;pet_id&gt;/</code></td><td>User Token</td><td>Toggle bookmark on/off for pet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
