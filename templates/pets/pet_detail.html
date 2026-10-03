@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ pet.name }} ({{ pet.breed }}) - PawHaven{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'pet_list' %}">Pets</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'pet_list' %}?animal_type={{ pet.animal_type }}">{{ pet.animal_type }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ pet.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <!-- Left: Pet Photo & Gallery -->
+        <div class="col-lg-6">
+            <div class="card p-2 shadow-sm border-0 position-relative overflow-hidden" style="border-radius: 24px; background: #FFFFFF;">
+                <div style="height: 420px; border-radius: 20px; overflow: hidden; background: #E9DEFF;" class="d-flex align-items-center justify-content-center">
+                    {% if pet.image %}
+                        <img src="{{ pet.image.url }}" class="w-100 h-100 object-fit-cover" alt="{{ pet.name }}">
+                    {% else %}
+                        <div class="text-center">
+                            <span style="font-size: 7rem;">
+                                {% if pet.animal_type == 'Dog' %}🐕
+                                {% elif pet.animal_type == 'Cat' %}🐈
+                                {% elif pet.animal_type == 'Rabbit' %}🐇
+                                {% elif pet.animal_type == 'Bird' %}🦜
+                                {% else %}🐾{% endif %}
+                            </span>
+                            <div class="text-muted small mt-2">No photo uploaded</div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Favorite Button Overlay -->
+                <div class="position-absolute top-0 end-0 m-4">
+                    {% if user.is_authenticated %}
+                        <button class="btn-fav js-fav-btn {% if is_favorited %}active{% endif %}" data-pet-id="{{ pet.id }}" title="Toggle Favorite">
+                            {% if is_favorited %}❤️{% else %}🤍{% endif %}
+                        </button>
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.get_full_path }}" class="btn-fav" title="Login to save">🤍</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Health & Verification Highlights (Unique Feature) -->
+            <div class="card mt-4 p-4 shadow-sm border" style="border-radius: 20px; border-color: #EDE6FD !important; background: #FAF9FE;">
+                <h6 class="fw-bold text-purple mb-3" style="color: #491AA0;"><i class="bi bi-shield-fill-check me-2 text-success"></i>Health & Temperament Verification</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="p-2 bg-white rounded-3 border d-flex align-items-center gap-2 small">
+                            <i class="bi {% if pet.is_vaccinated %}bi-check-circle-fill text-success{% else %}bi-x-circle text-muted{% endif %} fs-5"></i>
+                            <span>Vaccinated</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 bg-white rounded-3 border d-flex align-items-center gap-2 small">
+                            <i class="bi {% if pet.is_neutered %}bi-check-circle-fill text-success{% else %}bi-x-circle text-muted{% endif %} fs-5"></i>
+                            <span>Spayed / Neutered</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 bg-white rounded-3 border d-flex align-items-center gap-2 small">
+                            <i class="bi {% if pet.is_microchipped %}bi-check-circle-fill text-success{% else %}bi-x-circle text-muted{% endif %} fs-5"></i>
+                            <span>Microchipped</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 bg-white rounded-3 border d-flex align-items-center gap-2 small">
+                            <i class="bi {% if pet.good_with_kids %}bi-check-circle-fill text-success{% else %}bi-dash-circle text-muted{% endif %} fs-5"></i>
+                            <span>Child Friendly</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Information & Adoption Action -->
+        <div class="col-lg-6">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge-pill-tag">{{ pet.animal_type }}</span>
+                <span class="badge-pill-tag"><i class="bi bi-geo-alt-fill me-1"></i>{{ pet.location }}</span>
+            </div>
+
+            <h1 class="display-5 fw-extrabold mb-1" style="color: #2C0F66;">{{ pet.name }}</h1>
+            <p class="fs-5 text-muted mb-4">{{ pet.breed }}</p>
+
+            <!-- Specification Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-4">
+                    <div class="p-3 bg-white rounded-4 border text-center shadow-sm" style="border-color: #EDE6FD !important;">
+                        <span class="text-muted small d-block">Age</span>
+                        <strong class="text-purple" style="color: #622CD1;">{{ pet.age_display }}</strong>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-3 bg-white rounded-4 border text-center shadow-sm" style="border-color: #EDE6FD !important;">
+                        <span class="text-muted small d-block">Gender</span>
+                        <strong class="text-purple" style="color: #622CD1;">{{ pet.gender }}</strong>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-3 bg-white rounded-4 border text-center shadow-sm" style="border-color: #EDE6FD !important;">
+                        <span class="text-muted small d-block">Status</span>
+                        {% if pet.status == 'Available' %}
+                            <span class="badge-available">Available</span>
+                        {% else %}
+                            <span class="badge-adopted">Adopted</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="mb-4">
+                <h4 class="fw-bold text-purple mb-2" style="color: #491AA0;">About {{ pet.name }}</h4>
+                <div class="p-3 bg-white rounded-4 border shadow-sm text-secondary" style="border-color: #EDE6FD !important; line-height: 1.8;">
+                    {{ pet.description|linebreaks }}
+                </div>
+            </div>
+
+            {% if pet.rescue_story %}
+                <!-- Rescue Story -->
+                <div class="mb-4">
+                    <h5 class="fw-bold text-purple mb-2" style="color: #491AA0;"><i class="bi bi-bookmark-heart-fill me-2 text-danger"></i>Rescue Background</h5>
+                    <p class="text-muted small">{{ pet.rescue_story }}</p>
+                </div>
+            {% endif %}
+
+            <!-- Adoption Action Box (Compliant with PDF Page 3 & Rules 1, 2) -->
+            <div class="card p-4 shadow-sm border mt-4" style="border-radius: 20px; border-color: #D5C2FC !important; background: #FAF8FF;">
+                {% if pet.status == 'Adopted' %}
+                    <!-- PDF requirement Page 3: "If the pet has already been adopted: ❌ This pet has already been adopted. The adoption button should not be available." -->
+                    <div class="text-center py-3">
+                        <div class="text-danger fs-3 mb-2">❌</div>
+                        <h5 class="fw-bold text-danger mb-1">This pet has already been adopted.</h5>
+                        <p class="text-muted small mb-0">The adoption button is no longer available. Thank you for supporting pet rescues!</p>
+                    </div>
+                {% else %}
+                    <!-- Pet is Available -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-purple" style="color: #491AA0;">Interested in Adopting {{ pet.name }}?</h5>
+                            <small class="text-muted">Applications are reviewed within 24–48 hours.</small>
+                        </div>
+                        <span class="badge-available">Ready for Home</span>
+                    </div>
+
+                    {% if has_active_request %}
+                        <div class="alert alert-warning d-flex align-items-center gap-2 mb-0" style="border-radius: 14px;">
+                            <i class="bi bi-clock-history fs-4"></i>
+                            <div>
+                                <strong>Active Application in Progress:</strong><br>
+                                You already have a <strong>{{ user_application.status }}</strong> adoption request for {{ pet.name }}.
+                                <a href="{% url 'my_adoptions' %}" class="fw-bold text-dark text-decoration-underline ms-1">View Dashboard</a>
+                            </div>
+                        </div>
+                    {% elif user.is_authenticated %}
+                        <a href="{% url 'adopt_pet' pet.pk %}" class="btn btn-lavender w-100 py-3 fs-5 fw-bold text-center">
+                            <i class="bi bi-heart-fill me-2"></i>Apply for Adoption
+                        </a>
+                    {% else %}
+                        <div class="text-center">
+                            <p class="small text-muted mb-2">Please login to submit an adoption application for {{ pet.name }}.</p>
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-lavender w-100 py-3 fw-bold">
+                                Login to Apply for Adoption
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Similar Pets Suggestions -->
+    {% if similar_pets %}
+        <div class="mt-5 pt-4 border-top">
+            <h4 class="fw-bold mb-4" style="color: #2C0F66;">Other {{ pet.animal_type }} Companions Awaiting Homes</h4>
+            <div class="row g-4">
+                {% for sim in similar_pets %}
+                    <div class="col-md-4">
+                        <div class="card card-lavender p-3 h-100 d-flex flex-row align-items-center gap-3">
+                            <div style="width: 80px; height: 80px; border-radius: 14px; overflow: hidden; background: #E9DEFF; flex-shrink: 0;">
+                                {% if sim.image %}
+                                    <img src="{{ sim.image.url }}" class="w-100 h-100 object-fit-cover" alt="{{ sim.name }}">
+                                {% else %}
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center fs-3">🐾</div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-0 text-purple">{{ sim.name }}</h6>
+                                <div class="text-muted small">{{ sim.breed }}</div>
+                                <div class="small mt-1"><span class="badge-pill-tag">{{ sim.location }}</span></div>
+                            </div>
+                            <a href="{% url 'pet_detail' sim.pk %}" class="btn btn-sm btn-lavender-light">&rarr;</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
