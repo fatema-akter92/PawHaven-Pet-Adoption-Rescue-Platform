@@ -7,7 +7,7 @@
 
 ---
 
-## 📋 Features Implemented (From Specification)
+## Features Implemented (From Specification)
 
 ### 1. User Features & Authentication
 - **User Registration:** Custom registration with username, email, full name, and password confirmation.
@@ -68,7 +68,7 @@
 
 ---
 
-## 🌐 REST API Endpoints Overview
+## REST API Endpoints Overview
 
 | Method | Endpoint | Permissions | Description |
 |---|---|---|---|
